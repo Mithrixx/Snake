@@ -1,5 +1,7 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+const gameOverScreen = document.getElementById('gameOverScreen');
+const restartButton = document.getElementById('restartButton');
 
 const box = 20;
 let snake = [];
@@ -79,6 +81,8 @@ function draw() {
 
     if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
         clearInterval(game);
+        gameOverScreen.style.display = 'flex';
+        return;
     }
 
     snake.unshift(newHead);
@@ -89,3 +93,18 @@ function draw() {
 }
 
 let game = setInterval(draw, 100);
+
+function restartGame() {
+    gameOverScreen.style.display = 'none';
+    snake = [];
+    snake[0] = { x: 9 * box, y: 10 * box };
+    food = {
+        x: Math.floor(Math.random() * 15) * box,
+        y: Math.floor(Math.random() * 15) * box
+    };
+    score = 0;
+    d = undefined;
+    game = setInterval(draw, 100);
+}
+
+restartButton.addEventListener('click', restartGame);
