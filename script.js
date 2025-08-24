@@ -232,4 +232,4 @@ function explode(x, y) {
     }
 }
 
-document.getElementById('version').innerText = 'v08242025.1';
+document.getElementById('version').innerText = 'v08242025.2';
