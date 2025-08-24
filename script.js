@@ -231,5 +231,3 @@ function explode(x, y) {
         particles.push(new Particle(x, y));
     }
 }
-
-document.getElementById('version').innerText = 'v08242025.2';
