@@ -19,12 +19,23 @@ h1 {
 }
 
 #controls {
+    display: none; /* Hidden by default */
     position: fixed;
-    bottom: 20px;
+    bottom: 50px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
+    grid-template-areas:
+        ". up ."
+        "left . right"
+        ". down .";
+    grid-gap: 10px;
 }
+
+#up { grid-area: up; }
+#down { grid-area: down; }
+#left { grid-area: left; }
+#right { grid-area: right; }
 
 button {
     padding: 10px 20px;

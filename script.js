@@ -2,6 +2,7 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const gameOverScreen = document.getElementById('gameOverScreen');
 const restartButton = document.getElementById('restartButton');
+const controls = document.getElementById('controls');
 
 const box = 20;
 let snake = [];
@@ -20,15 +21,17 @@ document.getElementById("up").addEventListener("click", () => { if(d != "DOWN") 
 document.getElementById("down").addEventListener("click", () => { if(d != "UP") d = "DOWN"; });
 document.getElementById("left").addEventListener("click", () => { if(d != "RIGHT") d = "LEFT"; });
 document.getElementById("right").addEventListener("click", () => { if(d != "LEFT") d = "RIGHT"; });
+restartButton.addEventListener('click', restartGame);
 
 function direction(event) {
-    if (event.keyCode == 37 && d != "RIGHT") {
+    let key = event.keyCode;
+    if ((key == 37 || key == 65) && d != "RIGHT") {
         d = "LEFT";
-    } else if (event.keyCode == 38 && d != "DOWN") {
+    } else if ((key == 38 || key == 87) && d != "DOWN") {
         d = "UP";
-    } else if (event.keyCode == 39 && d != "LEFT") {
+    } else if ((key == 39 || key == 68) && d != "LEFT") {
         d = "RIGHT";
-    } else if (event.keyCode == 40 && d != "UP") {
+    } else if ((key == 40 || key == 83) && d != "UP") {
         d = "DOWN";
     }
 }
@@ -107,4 +110,10 @@ function restartGame() {
     game = setInterval(draw, 100);
 }
 
-restartButton.addEventListener('click', restartGame);
+function isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+if (isMobile()) {
+    controls.style.display = 'grid';
+}
