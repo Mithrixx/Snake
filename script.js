@@ -15,6 +15,7 @@ let food = {
 
 let score = 0;
 let d;
+let isGameOver = false;
 
 document.addEventListener("keydown", direction);
 document.getElementById("up").addEventListener("click", () => { if(d != "DOWN") d = "UP"; });
@@ -25,14 +26,21 @@ restartButton.addEventListener('click', restartGame);
 
 function direction(event) {
     let key = event.keyCode;
-    if ((key == 37 || key == 65) && d != "RIGHT") {
-        d = "LEFT";
-    } else if ((key == 38 || key == 87) && d != "DOWN") {
-        d = "UP";
-    } else if ((key == 39 || key == 68) && d != "LEFT") {
-        d = "RIGHT";
-    } else if ((key == 40 || key == 83) && d != "UP") {
-        d = "DOWN";
+    if (isGameOver && key === 13) {
+        restartGame();
+        return;
+    }
+
+    if (!isGameOver) {
+        if ((key == 37 || key == 65) && d != "RIGHT") {
+            d = "LEFT";
+        } else if ((key == 38 || key == 87) && d != "DOWN") {
+            d = "UP";
+        } else if ((key == 39 || key == 68) && d != "LEFT") {
+            d = "RIGHT";
+        } else if ((key == 40 || key == 83) && d != "UP") {
+            d = "DOWN";
+        }
     }
 }
 
@@ -85,6 +93,7 @@ function draw() {
     if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
         clearInterval(game);
         gameOverScreen.style.display = 'flex';
+        isGameOver = true;
         return;
     }
 
@@ -98,6 +107,7 @@ function draw() {
 let game = setInterval(draw, 100);
 
 function restartGame() {
+    isGameOver = false;
     gameOverScreen.style.display = 'none';
     snake = [];
     snake[0] = { x: 9 * box, y: 10 * box };
