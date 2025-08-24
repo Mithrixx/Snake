@@ -24,6 +24,7 @@ let isGameOver = false;
 
 let lastUpdateTime = 0;
 let gameLoopId;
+let particles = [];
 
 startButton.addEventListener('click', () => startGame(gameSpeed));
 settingsButton.addEventListener('click', showSettings);
@@ -40,7 +41,6 @@ document.getElementById("right").addEventListener("click", () => { if(d != "LEFT
 
 function setDifficulty(speed) {
     gameSpeed = speed;
-    // Optional: give visual feedback for selected difficulty
     document.querySelectorAll('#difficulty button').forEach(btn => btn.style.backgroundColor = 'transparent');
     if (speed === 150) easyBtn.style.backgroundColor = 'rgba(255,255,255,0.3)';
     if (speed === 100) mediumBtn.style.backgroundColor = 'rgba(255,255,255,0.3)';
@@ -79,6 +79,7 @@ function initGame() {
     score = 0;
     d = undefined;
     isGameOver = false;
+    particles = [];
     scoreDisplay.innerText = "Score: " + score;
     if (gameLoopId) cancelAnimationFrame(gameLoopId);
     lastUpdateTime = 0;
@@ -122,6 +123,7 @@ function update() {
     if (snakeX == food.x && snakeY == food.y) {
         score++;
         scoreDisplay.innerText = "Score: " + score;
+        explode(food.x + box / 2, food.y + box / 2);
         food = {
             x: Math.floor(Math.random() * 15) * box,
             y: Math.floor(Math.random() * 15) * box
@@ -158,6 +160,8 @@ function draw() {
 
     ctx.fillStyle = "#ff0000";
     ctx.fillRect(food.x, food.y, box, box);
+
+    particles.forEach(p => p.draw());
 }
 
 function collision(head, array) {
@@ -169,22 +173,63 @@ function collision(head, array) {
     return false;
 }
 
+function handleParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        if (particles[i].life <= 0) {
+            particles.splice(i, 1);
+        }
+    }
+}
+
 function gameLoop(currentTime) {
     if (isGameOver) return;
 
     gameLoopId = requestAnimationFrame(gameLoop);
 
+    handleParticles();
+    draw();
+
     const deltaTime = currentTime - lastUpdateTime;
     if (deltaTime < gameSpeed) return;
 
     lastUpdateTime = currentTime;
-
     update();
-    draw();
 }
 
 function isMobile() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+class Particle {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 5 + 2;
+        this.speedX = Math.random() * 4 - 2;
+        this.speedY = Math.random() * 4 - 2;
+        this.color = `hsl(${Math.random() * 60}, 100%, 50%)`;
+        this.life = 100;
+    }
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.life -= 2;
+    }
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.globalAlpha = this.life / 100;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+}
+
+function explode(x, y) {
+    for (let i = 0; i < 30; i++) {
+        particles.push(new Particle(x, y));
+    }
 }
 
 document.getElementById('version').innerText = 'v08242025.1';
