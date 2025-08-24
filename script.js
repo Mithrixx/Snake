@@ -1,28 +1,65 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+const startScreen = document.getElementById('startScreen');
+const easyBtn = document.getElementById('easy');
+const mediumBtn = document.getElementById('medium');
+const hardBtn = document.getElementById('hard');
+const scoreDisplay = document.getElementById('score');
 const gameOverScreen = document.getElementById('gameOverScreen');
+const finalScoreDisplay = document.getElementById('finalScore');
 const restartButton = document.getElementById('restartButton');
 const controls = document.getElementById('controls');
 
 const box = 20;
 let snake = [];
-snake[0] = { x: 9 * box, y: 10 * box };
-
-let food = {
-    x: Math.floor(Math.random() * 15) * box,
-    y: Math.floor(Math.random() * 15) * box
-};
-
+let food = {};
 let score = 0;
 let d;
+let game;
+let gameSpeed;
 let isGameOver = false;
 
+easyBtn.addEventListener('click', () => startGame(150));
+mediumBtn.addEventListener('click', () => startGame(100));
+hardBtn.addEventListener('click', () => startGame(50));
+restartButton.addEventListener('click', restartGame);
 document.addEventListener("keydown", direction);
 document.getElementById("up").addEventListener("click", () => { if(d != "DOWN") d = "UP"; });
 document.getElementById("down").addEventListener("click", () => { if(d != "UP") d = "DOWN"; });
 document.getElementById("left").addEventListener("click", () => { if(d != "RIGHT") d = "LEFT"; });
 document.getElementById("right").addEventListener("click", () => { if(d != "LEFT") d = "RIGHT"; });
-restartButton.addEventListener('click', restartGame);
+
+
+function startGame(speed) {
+    gameSpeed = speed;
+    startScreen.style.display = 'none';
+    canvas.style.display = 'block';
+    scoreDisplay.style.display = 'block';
+    if (isMobile()) {
+        controls.style.display = 'grid';
+    }
+    initGame();
+}
+
+function initGame() {
+    snake = [];
+    snake[0] = { x: 9 * box, y: 10 * box };
+    food = {
+        x: Math.floor(Math.random() * 15) * box,
+        y: Math.floor(Math.random() * 15) * box
+    };
+    score = 0;
+    d = undefined;
+    isGameOver = false;
+    scoreDisplay.innerText = "Score: " + score;
+    if(game) clearInterval(game);
+    game = setInterval(draw, gameSpeed);
+}
+
+function restartGame() {
+    gameOverScreen.style.display = 'none';
+    initGame();
+}
 
 function direction(event) {
     let key = event.keyCode;
@@ -57,14 +94,13 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (let i = 0; i < snake.length; i++) {
-        ctx.fillStyle = (i == 0) ? "green" : "white";
+        ctx.fillStyle = (i == 0) ? "#00ff00" : "#ffffff";
         ctx.fillRect(snake[i].x, snake[i].y, box, box);
-
-        ctx.strokeStyle = "red";
+        ctx.strokeStyle = "#000";
         ctx.strokeRect(snake[i].x, snake[i].y, box, box);
     }
 
-    ctx.fillStyle = "red";
+    ctx.fillStyle = "#ff0000";
     ctx.fillRect(food.x, food.y, box, box);
 
     let snakeX = snake[0].x;
@@ -77,6 +113,7 @@ function draw() {
 
     if (snakeX == food.x && snakeY == food.y) {
         score++;
+        scoreDisplay.innerText = "Score: " + score;
         food = {
             x: Math.floor(Math.random() * 15) * box,
             y: Math.floor(Math.random() * 15) * box
@@ -92,38 +129,15 @@ function draw() {
 
     if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
         clearInterval(game);
-        gameOverScreen.style.display = 'flex';
         isGameOver = true;
+        finalScoreDisplay.innerText = "Final Score: " + score;
+        gameOverScreen.style.display = 'flex';
         return;
     }
 
     snake.unshift(newHead);
-
-    ctx.fillStyle = "black";
-    ctx.font = "45px Changa one";
-    ctx.fillText(score, 2 * box, 1.6 * box);
-}
-
-let game = setInterval(draw, 100);
-
-function restartGame() {
-    isGameOver = false;
-    gameOverScreen.style.display = 'none';
-    snake = [];
-    snake[0] = { x: 9 * box, y: 10 * box };
-    food = {
-        x: Math.floor(Math.random() * 15) * box,
-        y: Math.floor(Math.random() * 15) * box
-    };
-    score = 0;
-    d = undefined;
-    game = setInterval(draw, 100);
 }
 
 function isMobile() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-
-if (isMobile()) {
-    controls.style.display = 'grid';
 }
