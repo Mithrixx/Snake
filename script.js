@@ -14,7 +14,8 @@ const finalScoreDisplay = document.getElementById('finalScore');
 const restartButton = document.getElementById('restartButton');
 const controls = document.getElementById('controls');
 
-const box = 20;
+const box = 30;
+const numCells = canvas.width / box;
 let snake = [];
 let food = {};
 let score = 0;
@@ -71,10 +72,10 @@ function startGame(speed) {
 
 function initGame() {
     snake = [];
-    snake[0] = { x: 9 * box, y: 10 * box };
+    snake[0] = { x: Math.floor(numCells / 2) * box, y: Math.floor(numCells / 2) * box };
     food = {
-        x: Math.floor(Math.random() * 15) * box,
-        y: Math.floor(Math.random() * 15) * box
+        x: Math.floor(Math.random() * numCells) * box,
+        y: Math.floor(Math.random() * numCells) * box
     };
     score = 0;
     d = undefined;
@@ -125,8 +126,8 @@ function update() {
         scoreDisplay.innerText = "Score: " + score;
         explode(food.x + box / 2, food.y + box / 2);
         food = {
-            x: Math.floor(Math.random() * 15) * box,
-            y: Math.floor(Math.random() * 15) * box
+            x: Math.floor(Math.random() * numCells) * box,
+            y: Math.floor(Math.random() * numCells) * box
         };
     } else {
         snake.pop();
